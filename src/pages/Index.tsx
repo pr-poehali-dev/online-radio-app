@@ -18,13 +18,13 @@ interface RadioStation {
 const radioStations: RadioStation[] = [
   {
     id: 1,
-    name: 'Моя Станция',
-    genre: 'Микс',
-    frequency: '88.8 FM',
-    streamUrl: 'https://example.com/stream1',
-    currentSong: 'Cosmic Journey',
-    artist: 'The Midnight',
-    coverUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
+    name: 'Radio Grace',
+    genre: 'Христианская музыка',
+    frequency: 'Online',
+    streamUrl: 'https://radio-grace.site/listen/radio_grace/radio.mp3',
+    currentSong: 'Слушайте Radio Grace',
+    artist: 'Прямой эфир',
+    coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
   }
 ];
 
