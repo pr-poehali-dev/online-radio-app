@@ -15,6 +15,16 @@ interface RadioStation {
   coverUrl: string;
 }
 
+interface NowPlayingData {
+  now_playing?: {
+    song?: {
+      title?: string;
+      artist?: string;
+      art?: string;
+    };
+  };
+}
+
 const radioStations: RadioStation[] = [
   {
     id: 1,
@@ -33,6 +43,7 @@ const Index = () => {
   const [currentStation, setCurrentStation] = useState<RadioStation>(radioStations[0]);
   const [volume, setVolume] = useState([70]);
   const [history, setHistory] = useState<RadioStation[]>([]);
+  const [currentTrack, setCurrentTrack] = useState({ title: 'Слушайте Radio Grace', artist: 'Прямой эфир', cover: radioStations[0].coverUrl });
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const togglePlay = () => {
@@ -68,7 +79,30 @@ const Index = () => {
     if (audioRef.current) {
       audioRef.current.volume = volume[0] / 100;
     }
-  }, []);
+
+    const fetchNowPlaying = async () => {
+      try {
+        const response = await fetch('https://radio-grace.site/api/nowplaying/radio_grace');
+        const data: NowPlayingData = await response.json();
+        
+        if (data.now_playing?.song) {
+          const song = data.now_playing.song;
+          setCurrentTrack({
+            title: song.title || 'Слушайте Radio Grace',
+            artist: song.artist || 'Прямой эфир',
+            cover: song.art || currentStation.coverUrl
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных трека:', error);
+      }
+    };
+
+    fetchNowPlaying();
+    const interval = setInterval(fetchNowPlaying, 10000);
+
+    return () => clearInterval(interval);
+  }, [currentStation.coverUrl]);
 
   return (
     <div className="min-h-screen radio-gradient relative overflow-hidden">
@@ -87,8 +121,8 @@ const Index = () => {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="md:w-64 md:h-64 w-full h-64 rounded-2xl overflow-hidden shadow-2xl relative group">
                 <img 
-                  src={currentStation.coverUrl} 
-                  alt={currentStation.currentSong}
+                  src={currentTrack.cover} 
+                  alt={currentTrack.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -116,8 +150,8 @@ const Index = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-xl font-semibold text-primary">{currentStation.currentSong}</p>
-                    <p className="text-lg text-muted-foreground">{currentStation.artist}</p>
+                    <p className="text-xl font-semibold text-primary">{currentTrack.title}</p>
+                    <p className="text-lg text-muted-foreground">{currentTrack.artist}</p>
                   </div>
                 </div>
 
